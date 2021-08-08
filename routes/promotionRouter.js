@@ -1,8 +1,8 @@
 const express = require('express');
 const promotionRouter = express.Router();
 
-
 const Promotions = require('../models/promotion');
+const authenticate = require('../authenticate');
 
 // the route is set in server.js using app.useMethod
 promotionRouter.route('/')
@@ -15,7 +15,7 @@ promotionRouter.route('/')
     })
     .catch(err => next(err));
 })
-.post((req, res, next) => {
+.post(authenticate.verifyUser, (req, res, next) => {
     Promotions.create(req.body)
     .then(promotions => {
         console.log('partner Created ', promotions);
@@ -26,11 +26,11 @@ promotionRouter.route('/')
     .catch(err => next(err));
 })
 
-.put((req, res) => {
+.put(authenticate.verifyUser, (req, res) => {
     res.statusCode = 403;
     res.end('PUT operation not supported on /partner');
 })
-.delete((req, res,next) => {
+.delete(authenticate.verifyUser, (req, res,next) => {
     Promotions.deleteMany()
     .then(response => {
         res.statusCode = 200;
@@ -51,10 +51,10 @@ promotionRouter.route('/:promotionId')
     })
     .catch(err => next(err));
 })
-.post((req, res) => {
+.post(authenticate.verifyUser, (req, res) => {
     res.end(`Will add the partners: ${req.body.name} with description: ${req.body.description}`);
 })
-.put((req, res) => {
+.put(authenticate.verifyUser, (req, res) => {
     Promotions.findByIdAndUpdate(req.params.promotionId, {
         $set: req.body
     }, { new: true })
@@ -65,7 +65,7 @@ promotionRouter.route('/:promotionId')
     })
     .catch(err => next(err));
 })
-.delete((req, res) => {
+.delete(authenticate.verifyUser, (req, res) => {
     Promotions.findByIdAndDelete(req.params.promotionId)
     .then(response => {
         res.statusCode = 200;
