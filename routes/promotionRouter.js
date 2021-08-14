@@ -1,12 +1,13 @@
 const express = require('express');
 const promotionRouter = express.Router();
-
+const cors = require('./cors')
 const Promotions = require('../models/promotion');
 const authenticate = require('../authenticate');
 
 // the route is set in server.js using app.useMethod
 promotionRouter.route('/')
-.get((req, res, next) => {
+.options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
+.get(cors.cors,(req, res, next) => {
     Promotions.find()
     .then(promotions => {
         res.statusCode = 200;
@@ -15,7 +16,7 @@ promotionRouter.route('/')
     })
     .catch(err => next(err));
 })
-.post(authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
+.post(cors.corsWithOptions,authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
     Promotions.create(req.body)
     .then(promotions => {
         console.log('partner Created ', promotions);
@@ -26,11 +27,11 @@ promotionRouter.route('/')
     .catch(err => next(err));
 })
 
-.put(authenticate.verifyUser, (req, res) => {
+.put(cors.corsWithOptions,authenticate.verifyUser,authenticate.verifyAdmin, (req, res) => {
     res.statusCode = 403;
     res.end('PUT operation not supported on /partner');
 })
-.delete(authenticate.verifyUser, authenticate.verifyAdmin, (req, res,next) => {
+.delete(cors.corsWithOptions,authenticate.verifyUser, authenticate.verifyAdmin, (req, res,next) => {
     Promotions.deleteMany()
     .then(response => {
         res.statusCode = 200;
@@ -42,7 +43,8 @@ promotionRouter.route('/')
 
 
 promotionRouter.route('/:promotionId')
-.get((req, res, next) => {
+.options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
+.get(cors.cors,(req, res, next) => {
     Promotions.findById(req.params.promotionId)
     .then(promotion => {
         res.statusCode = 200;
@@ -51,10 +53,10 @@ promotionRouter.route('/:promotionId')
     })
     .catch(err => next(err));
 })
-.post(authenticate.verifyUser, (req, res) => {
+.post(cors.corsWithOptions,authenticate.verifyUser, (req, res) => {
     res.end(`Will add the partners: ${req.body.name} with description: ${req.body.description}`);
 })
-.put(authenticate.verifyUser, authenticate.verifyAdmin, (req, res) => {
+.put(cors.corsWithOptions,authenticate.verifyUser, authenticate.verifyAdmin, (req, res) => {
     Promotions.findByIdAndUpdate(req.params.promotionId, {
         $set: req.body
     }, { new: true })
@@ -65,7 +67,7 @@ promotionRouter.route('/:promotionId')
     })
     .catch(err => next(err));
 })
-.delete(authenticate.verifyUser, authenticate.verifyAdmin, (req, res) => {
+.delete(cors.corsWithOptions,authenticate.verifyUser, authenticate.verifyAdmin, (req, res) => {
     Promotions.findByIdAndDelete(req.params.promotionId)
     .then(response => {
         res.statusCode = 200;
