@@ -12,7 +12,7 @@ const authenticate = require('../authenticate');
 router.get('/',
 cors.corsWithOptions,
 authenticate.verifyUser,
- authenticate.verifyAdmin, (req, res, next) => {
+  (req, res, next) => {
     User.find()
     .then(users => {
         res.statusCode = 200;
@@ -57,7 +57,7 @@ router.post('/signup', cors.corsWithOptions,(req, res) => {
     );
 });
 
-router.post('/login',cors.corsWithOptions, passport.authenticate('local'),
+router.post('/login', cors.corsWithOptions, passport.authenticate('local'),
  (req, res) => {
      console.log(res)
     const token = authenticate.getToken({_id: req.user._id});

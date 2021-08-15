@@ -3,6 +3,7 @@ const Schema = mongoose.Schema;
 
 
 const partnerSchema = new Schema({
+   
     name: {
         type: String,
         required: true,
@@ -18,6 +19,7 @@ const partnerSchema = new Schema({
         type: Boolean,
         default: false
     },
+    
     description: {
         type: String,
         required: true
